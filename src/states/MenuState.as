@@ -7,9 +7,10 @@ package states
 	public class MenuState extends FlxState
 	{
 		private var startButton:FlxButton;
-		private var sub:FlxText;
-		private var sub2:FlxText;
+		private var text:FlxText;
+		private var text2:FlxText;
 		private var counter:Number = 0;
+		private var logo:FlxSprite;
 
 		public function MenuState()
 		{
@@ -20,25 +21,27 @@ package states
 			
 			FlxG.bgColor = 0xfff8f8f8;
 
-			sub = new FlxText(0, 100, 256);
-			sub.color = 0xff000000;
-			sub.scrollFactor.x = 0;
-			sub.scrollFactor.y = 0;
-			sub.scale.x = 1;
-			sub.scale.y = 1;
-			sub.text = "-Press ENTER to start-";
-			sub.alignment = "center";
-			sub.exists = false;
+			logo = new FlxSprite(0, 0, GraphicsData.logoPNG);
+			text = new FlxText(0, 100, 256);
+			text.color = 0xff000000;
+			text.scrollFactor.x = 0;
+			text.scrollFactor.y = 0;
+			text.scale.x = 1;
+			text.scale.y = 1;
+			text.text = "-Press ENTER to start-";
+			text.alignment = "center";
+			text.exists = false;
 			
-			sub2 = new FlxText(0, 220, 256);
-			sub2.color = 0xff000000;
-			sub2.scrollFactor.x = 0;
-			sub2.scrollFactor.y = 0;
-			sub2.text = "Copy rights 2013 Khawariz Games";
-			sub2.alignment = "center";
+			text2 = new FlxText(0, 220, 256);
+			text2.color = 0xff000000;
+			text2.scrollFactor.x = 0;
+			text2.scrollFactor.y = 0;
+			text2.text = "Copy rights 2013 Khawariz Games";
+			text2.alignment = "center";
 
-			add(sub);
-			add(sub2);
+			add(logo);
+			add(text);
+			add(text2);
 		}
 		
 		override public function update():void
@@ -47,7 +50,7 @@ package states
 			counter += FlxG.elapsed;
 			if (counter >= 2)
 			{
-				sub.exists = true;
+				text.exists = true;
 				if (FlxG.keys.ENTER) {
 					startGame();
 				}

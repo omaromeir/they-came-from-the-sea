@@ -20,6 +20,7 @@ package states
 		private var _enemies:FlxGroup;
 		
 		private var score:FlxText;
+		private var won:FlxText;
 		private var timer:FlxText;
 		
 		public function PlayState ()
@@ -53,11 +54,22 @@ package states
 			score.text = "SCORE: 0";
 			
 			timer = new FlxText(0, 10, 100);
-			timer.color = 0xffffffff;
+			timer.color = 0xfff8f8f8;
 			timer.shadow = 0xff000000;
 			timer.scrollFactor.x = 0;
 			timer.scrollFactor.y = 0;
 			timer.text = "TIME: 0";
+			
+			won = new FlxText(0, 50, 256);
+			won.color = 0xff000000;
+			won.shadow = 0xff75c0c9;
+			won.scrollFactor.x = 0;
+			won.scrollFactor.y = 0;
+			won.scale.x = 3;
+			won.scale.y = 3;
+			won.text = "YOU SURVIVED";
+			won.alignment = "center";
+			won.exists = false;
 			
 			add(level);
 			add(stick);
@@ -65,12 +77,15 @@ package states
 			add(_enemies);
 			add(score);
 			add(timer);
+			add(won);
 			
 			FlxG.worldBounds = new FlxRect(0, 0, level.width, level.height);
 			
 			FlxG.camera.setBounds(0, 0, level.width, level.height);
 
 			FlxG.camera.follow(player, FlxCamera.STYLE_TOPDOWN_TIGHT);
+			
+			FlxG.playMusic(SoundData.track1, 0.2);
 		}
 		
 		override public function update():void
@@ -100,9 +115,15 @@ package states
 				}
 			}
 			
+			checkEnemies();
+			
 			if (levelTimer > 60)
 			{
-				remove(_enemies);
+				_enemies.kill();
+				won.exists = true;
+				if (FlxG.keys.justPressed("ENTER")) {
+					FlxG.switchState(new MenuState);
+				}
 			}
 			
 			if (resetSpawn) {
@@ -118,6 +139,14 @@ package states
 			FlxG.overlap(_enemies, stick, hitEnemy);
 		}
 		
+		public function checkEnemies():void {
+			for (var i:int = 0; i < _enemies.length; i++) {
+				if (_enemies.members[i].x < 0) {
+					FlxG.resetState();
+				}
+			}
+		}
+		
 		public function hitPlayer(p:Player, e:Enemy):void {
 			p.kill();
 			FlxG.resetState();
@@ -125,6 +154,7 @@ package states
 		
 		public function hitEnemy(e:Enemy, s:Stick):void {
 			e.kill();
+			FlxG.play(SoundData.enemyHitSFX);
 			FlxG.score++;
 			score.text = "SCORE: " + FlxG.score;
 		}
