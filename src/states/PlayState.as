@@ -1,9 +1,11 @@
 package states 
 {
+	import collectables.Food;
+	import collectables.Loot;
 	import enemies.*;
 	import org.flixel.*;
 	import org.flixel.system.FlxTile;
-	import org.flixel.FlxGroup;
+	import org.flixel.plugin.photonstorm.FlxCollision;
 	import levels.*;
 	import players.*;
 	import weapons.*;
@@ -18,6 +20,7 @@ package states
 		private var levelTimer:Number = 0;
 		private var resetSpawn:Boolean=false;
 		private var _enemies:FlxGroup;
+		private var _loot:FlxGroup;
 		
 		private var score:FlxText;
 		private var won:FlxText;
@@ -43,6 +46,7 @@ package states
 			Registry.player = player;
 			
 			_enemies = new FlxGroup();
+			_loot = new FlxGroup();
 			
 			stick = new Stick;
 			
@@ -51,7 +55,7 @@ package states
 			score.shadow = 0xff000000;
 			score.scrollFactor.x = 0;
 			score.scrollFactor.y = 0;
-			score.text = "SCORE: 0";
+			score.text = "HEALTH: 100";
 			
 			timer = new FlxText(0, 10, 100);
 			timer.color = 0xfff8f8f8;
@@ -74,6 +78,7 @@ package states
 			add(level);
 			add(stick);
 			add(player);
+			add(_loot);
 			add(_enemies);
 			add(score);
 			add(timer);
@@ -134,9 +139,12 @@ package states
 			var t:int = levelTimer;
 			timer.text = "TIME: " + t;
 			
+			score.text = "HEALTH: " + player.health;
+			
 			FlxG.collide(player, level);
 			FlxG.overlap(player, _enemies, hitPlayer);
 			FlxG.overlap(_enemies, stick, hitEnemy);
+			FlxG.overlap(player, _loot, getLoot);
 		}
 		
 		public function checkEnemies():void {
@@ -148,15 +156,33 @@ package states
 		}
 		
 		public function hitPlayer(p:Player, e:Enemy):void {
-			p.kill();
-			FlxG.resetState();
+			if(FlxCollision.pixelPerfectCheck(p, e)){
+				p.kill();
+				FlxG.resetState();
+			}
 		}
 		
 		public function hitEnemy(e:Enemy, s:Stick):void {
-			e.kill();
-			FlxG.play(SoundData.enemyHitSFX);
-			FlxG.score++;
-			score.text = "SCORE: " + FlxG.score;
+			if (FlxCollision.pixelPerfectCheck(e, s)) {
+				e.health--;
+				FlxG.play(SoundData.enemyHitSFX);
+				e.kill();
+				var r:int = 2 * Math.random();
+				if (r >= 1) {
+					_loot.add(new Food(e.x, e.y));
+				}
+			}
+		}
+		
+		public function getLoot(p:Player, l:Loot):void {
+			if(FlxCollision.pixelPerfectCheck(p, l)){
+				l.kill();
+				p.health += 5;
+				if (p.health > 100)
+				{
+					p.health = 100;
+				}
+			}
 		}
 	}
 }

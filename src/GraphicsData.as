@@ -11,6 +11,7 @@ package
 		[Embed(source = 'assets/stickSpriteSheet.png')] public static var stickPNG:Class;
 		[Embed(source = 'assets/crabSpriteSheet.png')] public static var crabPNG:Class;
 		[Embed(source = 'assets/logo.png')] public static var logoPNG:Class;
+		[Embed(source = 'assets/food.png')] public static var foodPNG:Class;
 		
 		public function GraphicsData() 
 		{

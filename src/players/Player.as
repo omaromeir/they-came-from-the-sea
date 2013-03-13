@@ -3,9 +3,11 @@ package players
 	import org.flixel.*;
 	import org.flixel.plugin.photonstorm.*;
 	import weapons.*;
-	
+
 	public class Player extends FlxSprite
 	{	
+		private var lifeCount:Number = 0;
+		
 		public function Player(X:Number, Y:Number)
 		{
 			super(X*16, Y*16);
@@ -15,6 +17,8 @@ package players
 			width = 16;
 			height = 16;
 			offset.y = 2;
+			
+			health = 100;
 			
 			addAnimation("idle_down", [1], 0, false);
 			addAnimation("idle_up", [5], 0, false);
@@ -43,6 +47,12 @@ package players
 		override public function update():void
 		{
 			super.update();
+			lifeCount += FlxG.elapsed;
+			if (lifeCount >= 1)
+			{
+				health--;
+				lifeCount = 0;
+			}
 			updateAnimations();
 			if (FlxG.keys.SPACE) {
 				swing();

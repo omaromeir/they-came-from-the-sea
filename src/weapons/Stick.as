@@ -4,6 +4,7 @@ package weapons
 
 	public class Stick extends FlxSprite
 	{
+		public var damage:int = 1;
 		public function Stick() 
 		{
 			super(Registry.player.x, Registry.player.y);
