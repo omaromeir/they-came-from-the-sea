@@ -22,9 +22,14 @@ package states
 		private var _enemies:FlxGroup;
 		private var _loot:FlxGroup;
 		
+		private var timeLimit:int = 60;
+		
 		private var score:FlxText;
 		private var won:FlxText;
+		private var objective:FlxText;
 		private var timer:FlxText;
+		
+		private var _enemyHit:Boolean = false;
 		
 		public function PlayState ()
 		{
@@ -75,14 +80,22 @@ package states
 			won.alignment = "center";
 			won.exists = false;
 			
+			objective = new FlxText(0, 50, 256);
+			objective.color = 0xff000000;
+			objective.scrollFactor.x = 0;
+			objective.scrollFactor.y = 0;
+			objective.text = "SURVIVE FOR "+timeLimit+" SECONDS";
+			objective.alignment = "center";
+			
 			add(level);
-			add(stick);
-			add(player);
 			add(_loot);
 			add(_enemies);
+			add(stick);
+			add(player);
 			add(score);
 			add(timer);
 			add(won);
+			add(objective);
 			
 			FlxG.worldBounds = new FlxRect(0, 0, level.width, level.height);
 			
@@ -98,8 +111,15 @@ package states
 			spawnTimer += FlxG.elapsed;
 			levelTimer += FlxG.elapsed;
 			
-			super.update();
+			if (levelTimer >= 2) {
+				objective.exists = false;
+			}
 			
+			super.update();
+			if (FlxG.keys.justReleased("SPACE") && _enemyHit)
+			{
+				_enemyHit = false;
+			}
 			if(player.x < 0)
 			{
 				player.x = 0;
@@ -107,22 +127,19 @@ package states
 			
 			if (spawnTimer >= spawnTime) {
 				var x:int = 8 * Math.random() + 8;
-				var y:int = 4 * Math.random() + 2;
-				_enemies.add(new Crab(16, y));
+				var y:int = 5 * Math.random() + 2;
+				if (levelTimer > timeLimit/2)
+				{
+					y = 4 * Math.random() + 2;
+					_enemies.add(new Snake(13, y));
+				}
+				else {
+					_enemies.add(new Crab(16, y));
+				}
 				resetSpawn = true;
 			}
 			
-			if (levelTimer > 30)
-			{
-				spawnTime = 1;
-				for (var i:int = 0; i < _enemies.length; i++) {
-					_enemies.members[i].velocity.x = -20;
-				}
-			}
-			
-			checkEnemies();
-			
-			if (levelTimer > 60)
+			if (levelTimer > timeLimit)
 			{
 				_enemies.kill();
 				won.exists = true;
@@ -134,6 +151,14 @@ package states
 			if (resetSpawn) {
 				spawnTimer = 0;
 				resetSpawn = false;
+			}
+			
+			checkEnemies();
+
+			if (player.health == 0)
+			{
+				player.kill();
+				FlxG.resetState();
 			}
 			
 			var t:int = levelTimer;
@@ -156,20 +181,57 @@ package states
 		}
 		
 		public function hitPlayer(p:Player, e:Enemy):void {
-			if(FlxCollision.pixelPerfectCheck(p, e)){
-				p.kill();
-				FlxG.resetState();
+			if (FlxCollision.pixelPerfectCheck(p, e))
+			{
+				p.health -= 10;
+				if (p.health < 0)
+				{
+					p.health = 0;
+				}
+				FlxG.play(SoundData.playerHitSFX);
+				if (p.solid && FlxCollision.pixelPerfectCheck(p, e) )
+				{
+				 	pushPlayer(p, e);
+				}
+				p.flicker(0.5);
+				p.solid = false;
+			}
+		}
+		
+		public function pushPlayer(p:Player, e:Enemy):void {
+			if (p.facing == FlxObject.DOWN)
+			{
+				p.y = p.y - 5;	
+			}
+			if (p.x > e.x)
+			{
+				p.x = p.x + 5;	
+			}	
+			if (p.facing == FlxObject.UP)
+			{
+				p.y = p.y + 5;	
+			}
+			if (p.x < e.x)
+			{
+				p.x = p.x - 5;	
 			}
 		}
 		
 		public function hitEnemy(e:Enemy, s:Stick):void {
-			if (FlxCollision.pixelPerfectCheck(e, s)) {
+			if (FlxCollision.pixelPerfectCheck(e, s) && !_enemyHit) {
+				e.flicker(0.2);
 				e.health--;
+				_enemyHit = true;
 				FlxG.play(SoundData.enemyHitSFX);
-				e.kill();
-				var r:int = 2 * Math.random();
-				if (r >= 1) {
-					_loot.add(new Food(e.x, e.y));
+				if (e.health == 0)
+				{
+					e.kill();
+					var r:int = 2 * Math.random();
+					if (r >= 1)
+					{
+						_loot.add(new Food(e.x, e.y));
+
+					}
 				}
 			}
 		}

@@ -7,7 +7,8 @@ package players
 	public class Player extends FlxSprite
 	{	
 		private var lifeCount:Number = 0;
-		
+		private var solidCount:Number = 0;
+
 		public function Player(X:Number, Y:Number)
 		{
 			super(X*16, Y*16);
@@ -53,12 +54,24 @@ package players
 				health--;
 				lifeCount = 0;
 			}
+			
 			updateAnimations();
 			if (FlxG.keys.SPACE) {
 				swing();
 			}
+			
 			if (FlxG.keys.justPressed("SPACE")) {
 				FlxG.play(SoundData.swingSFX, 0.1);
+			}
+			
+			if (!solid)
+			{
+				solidCount+= FlxG.elapsed;
+				if (solidCount >= 0.5)
+				{
+				solid = true;
+				solidCount = 0;
+				}	
 			}
 		}
 		
