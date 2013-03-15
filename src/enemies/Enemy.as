@@ -1,13 +1,15 @@
 package enemies 
 {
 	import org.flixel.*;
+	import org.flixel.plugin.photonstorm.*;
 	/**
 	 * ...
 	 * @author Omar
 	 */
 	public class Enemy extends FlxSprite
 	{
-		public var speed:int=10;
+		public var speed:int = 10;
+		
 		public function Enemy(X:Number, Y:Number) 
 		{
 			super(X*16, Y*16);
@@ -20,7 +22,7 @@ package enemies
 			super.update();
 		}
 		
-		protected function turnAround(speed:int):void {
+		public function turnAround(speed:int):void {
 			if (facing == FlxObject.RIGHT)
 			{
 				facing = FlxObject.LEFT;

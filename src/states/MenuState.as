@@ -1,5 +1,6 @@
 package states
 {
+	import cutscenes.Intro;
 	import org.flixel.*;
 	import org.flixel.plugin.photonstorm.*;
 	import org.flixel.plugin.photonstorm.FX.FloodFillFX;
@@ -21,7 +22,11 @@ package states
 			
 			FlxG.bgColor = 0xfff8f8f8;
 
-			logo = new FlxSprite(0, 0, GraphicsData.logoPNG);
+			logo = new FlxSprite(25, 20, GraphicsData.logoPNG);
+			logo.loadGraphic(GraphicsData.logoPNG, true, false, 204, 63);
+			logo.addAnimation("shimmer", [0, 1, 0], 3, false);
+			logo.play("shimmer");
+			
 			text = new FlxText(0, 100, 256);
 			text.color = 0xff000000;
 			text.scrollFactor.x = 0;
@@ -50,18 +55,18 @@ package states
 			counter += FlxG.elapsed;
 			if (counter >= 2)
 			{
+				logo.play("shimmer");
 				text.exists = true;
 				if (FlxG.keys.ENTER) {
 					startGame();
 				}
 			}
-			
 		}
 
 		private function startGame():void
 		{
 			FlxG.mouse.hide();
-			FlxG.switchState(new PlayState);
+			FlxG.switchState(new Intro);
 		}
 	}
 }

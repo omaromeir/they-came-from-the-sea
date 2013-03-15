@@ -2,7 +2,7 @@ package
 {
 	import org.flixel.FlxGame;
 	import states.*;
-	import cutscenes.Splash;
+	import cutscenes.*;
 	
 	public class FirstGame extends FlxGame
 	{

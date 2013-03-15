@@ -5,7 +5,7 @@ package states
 	import enemies.*;
 	import org.flixel.*;
 	import org.flixel.system.FlxTile;
-	import org.flixel.plugin.photonstorm.FlxCollision;
+	import org.flixel.plugin.photonstorm.*;
 	import levels.*;
 	import players.*;
 	import weapons.*;
@@ -21,6 +21,7 @@ package states
 		private var resetSpawn:Boolean=false;
 		private var _enemies:FlxGroup;
 		private var _loot:FlxGroup;
+		private var box:Box;
 		
 		private var timeLimit:int = 60;
 		
@@ -30,6 +31,8 @@ package states
 		private var timer:FlxText;
 		
 		private var _enemyHit:Boolean = false;
+		
+		private var HPBar:FlxBar;
 		
 		public function PlayState ()
 		{
@@ -60,7 +63,7 @@ package states
 			score.shadow = 0xff000000;
 			score.scrollFactor.x = 0;
 			score.scrollFactor.y = 0;
-			score.text = "HEALTH: 100";
+			score.text = "HP:";
 			
 			timer = new FlxText(0, 10, 100);
 			timer.color = 0xfff8f8f8;
@@ -87,7 +90,10 @@ package states
 			objective.text = "SURVIVE FOR "+timeLimit+" SECONDS";
 			objective.alignment = "center";
 			
+			box = new Box(5, 5);
+			
 			add(level);
+			add(box);
 			add(_loot);
 			add(_enemies);
 			add(stick);
@@ -104,6 +110,12 @@ package states
 			FlxG.camera.follow(player, FlxCamera.STYLE_TOPDOWN_TIGHT);
 			
 			FlxG.playMusic(SoundData.track1, 0.2);
+			
+			HPBar = new FlxBar(20, 3, FlxBar.FILL_LEFT_TO_RIGHT, 100, 4, player, "health");
+			
+			HPBar.createImageBar(null, GraphicsData.heartPNG, 0xff);
+			
+			add(HPBar);
 		}
 		
 		override public function update():void
@@ -144,6 +156,7 @@ package states
 				_enemies.kill();
 				won.exists = true;
 				if (FlxG.keys.justPressed("ENTER")) {
+					FlxG.music.destroy();
 					FlxG.switchState(new MenuState);
 				}
 			}
@@ -164,9 +177,12 @@ package states
 			var t:int = levelTimer;
 			timer.text = "TIME: " + t;
 			
-			score.text = "HEALTH: " + player.health;
+			score.text = "HP:";
 			
 			FlxG.collide(player, level);
+			FlxG.collide(player, box);
+			FlxG.collide(box, level);
+			FlxG.collide(box, _enemies, enemyTurnAround);
 			FlxG.overlap(player, _enemies, hitPlayer);
 			FlxG.overlap(_enemies, stick, hitEnemy);
 			FlxG.overlap(player, _loot, getLoot);
@@ -178,6 +194,10 @@ package states
 					FlxG.resetState();
 				}
 			}
+		}
+		
+		public function enemyTurnAround(b:Box, e:Enemy):void {
+			e.turnAround(e.speed);
 		}
 		
 		public function hitPlayer(p:Player, e:Enemy):void {
@@ -237,7 +257,8 @@ package states
 		}
 		
 		public function getLoot(p:Player, l:Loot):void {
-			if(FlxCollision.pixelPerfectCheck(p, l)){
+			if (FlxCollision.pixelPerfectCheck(p, l)) {
+			FlxG.play(SoundData.foodSFX);	
 				l.kill();
 				p.health += 5;
 				if (p.health > 100)
