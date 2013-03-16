@@ -8,10 +8,13 @@ package states
 	public class MenuState extends FlxState
 	{
 		private var startButton:FlxButton;
-		private var text:FlxText;
+		//private var text:FlxText; //English version
+		private var text:FlxSprite; //Arabic version
 		private var text2:FlxText;
 		private var counter:Number = 0;
+		private var bg:FlxSprite;
 		private var logo:FlxSprite;
+		private var instructions:FlxSprite;
 
 		public function MenuState()
 		{
@@ -21,13 +24,23 @@ package states
 		{
 			
 			FlxG.bgColor = 0xfff8f8f8;
-
-			logo = new FlxSprite(25, 20, GraphicsData.logoPNG);
+			
+			bg = new FlxSprite(0, 0, GraphicsData.mainPNG);
+			bg.loadGraphic(GraphicsData.mainPNG, true, false, 256, 144, true);
+			bg.addAnimation("main", [0], 0, false);
+			bg.addAnimation("main2", [1], 0, false);
+			bg.play("main");
+			if (Registry.gameEnd) {
+				bg.play("main2");
+			}
+			logo = new FlxSprite(25, 10, GraphicsData.logoPNG);
 			logo.loadGraphic(GraphicsData.logoPNG, true, false, 204, 63);
 			logo.addAnimation("shimmer", [0, 1, 0], 3, false);
 			logo.play("shimmer");
 			
-			text = new FlxText(0, 100, 256);
+			Registry.level = 1;
+			
+			/*text = new FlxText(0, 100, 256);
 			text.color = 0xff000000;
 			text.scrollFactor.x = 0;
 			text.scrollFactor.y = 0;
@@ -35,18 +48,19 @@ package states
 			text.scale.y = 1;
 			text.text = "-Press ENTER to start-";
 			text.alignment = "center";
+			text.exists = false;*/
+			
+			text = new FlxSprite(0, 105, GraphicsData.enterPNG);
 			text.exists = false;
 			
-			text2 = new FlxText(0, 220, 256);
-			text2.color = 0xff000000;
-			text2.scrollFactor.x = 0;
-			text2.scrollFactor.y = 0;
-			text2.text = "Copy rights 2013 Khawariz Games";
-			text2.alignment = "center";
+			instructions = new FlxSprite(0, 0, GraphicsData.instructionsPNG);
+			instructions.exists = false;
 
+			add(bg);
 			add(logo);
 			add(text);
 			add(text2);
+			add(instructions);
 		}
 		
 		override public function update():void
@@ -60,13 +74,20 @@ package states
 				if (FlxG.keys.ENTER) {
 					startGame();
 				}
+				if (FlxG.keys.justPressed("ESCAPE")) {
+					toggleInstructions();
+				}
 			}
 		}
 
 		private function startGame():void
 		{
-			FlxG.mouse.hide();
 			FlxG.switchState(new Intro);
+		}
+		
+		private function toggleInstructions():void
+		{
+			instructions.exists = !instructions.exists;
 		}
 	}
 }

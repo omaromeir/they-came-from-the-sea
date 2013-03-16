@@ -180,10 +180,13 @@ package cutscenes
 			if (counter >= 24) {
 				FlxG.fade(0xfff8f8f8, 1, changeState);
 			}
+			if (FlxG.keys.ENTER) {
+				FlxG.fade(0xfff8f8f8, 1, changeState);
+			}
 		}
 		
 		private function changeState():void {
-			FlxG.switchState(new PlayState);
+			FlxG.switchState(new levelIntro);
 		}
 		
 	}

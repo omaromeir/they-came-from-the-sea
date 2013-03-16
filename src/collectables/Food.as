@@ -19,7 +19,6 @@ package collectables
 		{
 			super.update();
 			lifeCount += FlxG.elapsed;
-			FlxG.log(lifeCount);
 			if (lifeCount > 5)
 			{
 				exists = false;

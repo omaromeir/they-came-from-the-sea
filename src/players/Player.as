@@ -15,8 +15,8 @@ package players
 
 			loadGraphic(GraphicsData.playerPNG, true, true, 16, 18, true);
 			
-			width = 16;
-			height = 16;
+			width = 14;
+			height = 14;
 			offset.y = 2;
 			
 			health = 100;
@@ -62,6 +62,10 @@ package players
 			
 			if (FlxG.keys.justPressed("SPACE")) {
 				FlxG.play(SoundData.swingSFX, 0.1);
+			}
+			
+			if (FlxG.keys.justPressed("S")) {
+				swing();
 			}
 			
 			if (!solid)

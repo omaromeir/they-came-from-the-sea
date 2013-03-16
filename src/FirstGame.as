@@ -9,7 +9,7 @@ package
 		public function FirstGame()
 		{
 			super(256, 144, Splash, 2, 60, 60);
-			forceDebugger = true;
+			//forceDebugger = true;
 		}
 	}
 }

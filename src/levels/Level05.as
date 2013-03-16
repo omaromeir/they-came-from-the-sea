@@ -4,19 +4,19 @@ package levels
 	import enemies.*;
 	import players.*;
 
-	public class Level01 extends Level
+	public class Level05 extends Level
 	{
 
 		
-		public function Level01()
+		public function Level05()
 		{
 			super();
 			
-			timeLimit = 30;
-			landWidth = 5;
+			timeLimit = 90;
+			landWidth = 4;
 			eggs = 5;
 			
-			levelNumber = 1;
+			levelNumber = 5;
 			
 			map = new FlxTilemap;
 			

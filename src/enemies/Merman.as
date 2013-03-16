@@ -14,6 +14,7 @@ package enemies
 			addAnimation("walk", [9, 10, 11], 6, true);
 			addAnimation("swim", [8], 0, false);
 			health = 5;
+			ID = 2;
 		}
 		
 		override public function update():void
