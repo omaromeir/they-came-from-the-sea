@@ -19,7 +19,7 @@ package cutscenes
 		[Embed(source = '../assets/cutscenes/Ending/playerHopSpriteSheet.png')] private var playerHopPNG:Class;
 		[Embed(source = '../assets/cutscenes/Ending/laugh.png')] private var laughPNG:Class;
 		[Embed(source = '../assets/cutscenes/Ending/duckPlayerSpriteSheet.png')] private var duckPlayerPNG:Class;
-		[Embed(source = '../assets/cutscenes/Ending/credits.png')] private var creditsPNG:Class;
+		[Embed(source = '../assets/cutscenes/Ending/credits2.png')] private var creditsPNG:Class;
 		
 		private var frame0:FlxSprite;
 		private var frame1:FlxSprite;

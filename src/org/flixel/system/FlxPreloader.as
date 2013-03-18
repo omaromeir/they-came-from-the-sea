@@ -23,9 +23,8 @@ package org.flixel.system
 	 */
 	public class FlxPreloader extends MovieClip
 	{
-		[Embed(source="../data/logo.png")] protected var ImgLogo:Class;
-		[Embed(source="../data/logo_corners.png")] protected var ImgLogoCorners:Class;
-		[Embed(source="../data/logo_light.png")] protected var ImgLogoLight:Class;
+		[Embed(source='../../../assets/Other/logoPreloader.png')] protected var ImgLogo:Class;
+		[Embed(source = '../../../assets/Other/preloaderText.png')] protected var ImgAText:Class;
 
 		/**
 		 * @private
@@ -39,6 +38,7 @@ package org.flixel.system
 		 * @private
 		 */
 		protected var _bmpBar:Bitmap;
+		protected var _bmpBarFull:Bitmap;
 		/**
 		 * @private
 		 */
@@ -55,10 +55,7 @@ package org.flixel.system
 		 * @private
 		 */
 		protected var _logo:Bitmap;
-		/**
-		 * @private
-		 */
-		protected var _logoGlow:Bitmap;
+		protected var _aText:Bitmap;
 		/**
 		 * @private
 		 */
@@ -102,7 +99,7 @@ package org.flixel.system
 			var tmp:Bitmap;
 			if(!FlxG.debug && (myURL != null) && (root.loaderInfo.url.indexOf(myURL) < 0))
 			{
-				tmp = new Bitmap(new BitmapData(stage.stageWidth,stage.stageHeight,true,0xFFFFFFFF));
+				tmp = new Bitmap(new BitmapData(stage.stageWidth,stage.stageHeight,true,0xFFF8F8F8));
 				addChild(tmp);
 				
 				var format:TextFormat = new TextFormat();
@@ -162,9 +159,9 @@ package org.flixel.system
             else
 			{
 				var percent:Number = root.loaderInfo.bytesLoaded/root.loaderInfo.bytesTotal;
-				if((_min > 0) && (percent > time/_min))
-					percent = time/_min;
-            	update(percent);
+				var part:int = root.loaderInfo.bytesLoaded / 1024;
+				var total:int = root.loaderInfo.bytesTotal / 1024;
+            	update(percent, part, total);
 			}
         }
 		
@@ -183,55 +180,32 @@ package org.flixel.system
 			addChild(_buffer);
 			_width = stage.stageWidth/_buffer.scaleX;
 			_height = stage.stageHeight/_buffer.scaleY;
-			_buffer.addChild(new Bitmap(new BitmapData(_width,_height,false,0x00345e)));
-			var bitmap:Bitmap = new ImgLogoLight();
-			bitmap.smoothing = true;
-			bitmap.width = bitmap.height = _height;
-			bitmap.x = (_width-bitmap.width)/2;
-			_buffer.addChild(bitmap);
-			_bmpBar = new Bitmap(new BitmapData(1,7,false,0x5f6aff));
-			_bmpBar.x = 4;
-			_bmpBar.y = _height-11;
+			_buffer.addChild(new Bitmap(new BitmapData(_width,_height,false,0xf8f8f8)));
+			_bmpBarFull = new Bitmap(new BitmapData(1,7,false,0x000000));
+			_bmpBarFull.x = _width / 4;
+			_bmpBarFull.y = _height / 2;
+			_buffer.addChild(_bmpBarFull);
+			_bmpBar = new Bitmap(new BitmapData(1,7,false,0xc0aec7));
+			_bmpBar.x = _width / 4;
+			_bmpBar.y = _height / 2;
 			_buffer.addChild(_bmpBar);
 			_text = new TextField();
-			_text.defaultTextFormat = new TextFormat("system",8,0x5f6aff);
+			_text.defaultTextFormat = new TextFormat("system",8,0x000000);
 			_text.embedFonts = true;
 			_text.selectable = false;
 			_text.multiline = false;
 			_text.x = 2;
-			_text.y = _bmpBar.y - 11;
+			_text.y = 130;
 			_text.width = 80;
 			_buffer.addChild(_text);
 			_logo = new ImgLogo();
-			_logo.scaleX = _logo.scaleY = _height/8;
 			_logo.x = (_width-_logo.width)/2;
-			_logo.y = (_height-_logo.height)/2;
+			_logo.y = (_height-_logo.height)/3;
 			_buffer.addChild(_logo);
-			_logoGlow = new ImgLogo();
-			_logoGlow.smoothing = true;
-			_logoGlow.blendMode = "screen";
-			_logoGlow.scaleX = _logoGlow.scaleY = _height/8;
-			_logoGlow.x = (_width-_logoGlow.width)/2;
-			_logoGlow.y = (_height-_logoGlow.height)/2;
-			_buffer.addChild(_logoGlow);
-			bitmap = new ImgLogoCorners();
-			bitmap.smoothing = true;
-			bitmap.width = _width;
-			bitmap.height = _height;
-			_buffer.addChild(bitmap);
-			bitmap = new Bitmap(new BitmapData(_width,_height,false,0xffffff));
-			var i:uint = 0;
-			var j:uint = 0;
-			while(i < _height)
-			{
-				j = 0;
-				while(j < _width)
-					bitmap.bitmapData.setPixel(j++,i,0);
-				i+=2;
-			}
-			bitmap.blendMode = "overlay";
-			bitmap.alpha = 0.25;
-			_buffer.addChild(bitmap);
+			_aText = new ImgAText();
+			_aText.x = (_width-_aText.width)/2;
+			_aText.y = (_height-_aText.height)/1.5;
+			_buffer.addChild(_aText);
 		}
 		
 		protected function destroy():void
@@ -241,7 +215,6 @@ package org.flixel.system
 			_bmpBar = null;
 			_text = null;
 			_logo = null;
-			_logoGlow = null;
 		}
 		
 		/**
@@ -249,42 +222,14 @@ package org.flixel.system
 		 * 
 		 * @param	Percent		How much of the program has loaded.
 		 */
-		protected function update(Percent:Number):void
+		protected function update(Percent:Number, p:Number, t:Number):void
 		{
-			_bmpBar.scaleX = Percent*(_width-8);
-			_text.text = "FLX v"+FlxG.LIBRARY_MAJOR_VERSION+"."+FlxG.LIBRARY_MINOR_VERSION+" "+Math.floor(Percent*100)+"%";
-			_text.setTextFormat(_text.defaultTextFormat);
-			if(Percent < 0.1)
-			{
-				_logoGlow.alpha = 0;
-				_logo.alpha = 0;
-			}
-			else if(Percent < 0.15)
-			{
-				_logoGlow.alpha = Math.random();
-				_logo.alpha = 0;
-			}
-			else if(Percent < 0.2)
-			{
-				_logoGlow.alpha = 0;
-				_logo.alpha = 0;
-			}
-			else if(Percent < 0.25)
-			{
-				_logoGlow.alpha = 0;
-				_logo.alpha = Math.random();
-			}
-			else if(Percent < 0.7)
-			{
-				_logoGlow.alpha = (Percent-0.45)/0.45;
-				_logo.alpha = 1;
-			}
-			else if((Percent > 0.8) && (Percent < 0.9))
-			{
-				_logoGlow.alpha = 1-(Percent-0.8)/0.1;
-				_logo.alpha = 0;
-			}
-			else if(Percent > 0.9)
+			_bmpBarFull.scaleX = (_width) / 2;
+			_bmpBar.scaleX = Percent*(_width)/2;
+			/*_text.text = p+"/"+t+" KB";
+			_text.setTextFormat(_text.defaultTextFormat);*/
+			_logo.alpha = 1;
+			if(Percent > 0.9)
 			{
 				_buffer.alpha = 1-(Percent-0.9)/0.1;
 			}

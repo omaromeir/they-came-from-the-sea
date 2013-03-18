@@ -13,6 +13,7 @@ package levels
 			super();
 			
 			timeLimit = 90;
+			enemyLimit = 50;
 			landWidth = 4;
 			eggs = 5;
 			

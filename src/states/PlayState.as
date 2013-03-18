@@ -21,7 +21,7 @@ package states
 		
 		private var level:Level;
 		private var spawnTimer:Number = 0;
-		private var spawnTime:Number = 2;
+		private var spawnTime:Number;
 		private var levelTimer:Number = 0;
 		private var fadeTimer:Number = 0;
 		private var resetSpawn:Boolean=false;
@@ -31,11 +31,13 @@ package states
 		private var box:Box;
 		
 		private var timeLimit:int;
+		private var enemyLimit:int;
 		
 		private var loseScreen:FlxSprite;
 		
 		private var _enemyHit:Boolean = false;
 		private var _lost:Boolean = false;
+		private var _won:Boolean = false;
 		
 		//hud elements
 		private var HPBar:FlxBar;
@@ -68,6 +70,15 @@ package states
 				level = new Level05;
 			}
 			
+			if (Registry.easyMode) {
+				spawnTime = 3;
+				enemyLimit = level.enemyLimit - 10;
+			}
+			else {
+				spawnTime = 2;
+				enemyLimit = level.enemyLimit;
+			}
+			
 			timeLimit = level.timeLimit;
 			
 			var x:int;
@@ -79,7 +90,8 @@ package states
 			player = new Player(x, y);
 			Registry.player = player;
 			
-			_enemies = new FlxGroup();
+			_enemies = new FlxGroup(enemyLimit);
+			
 			_loot = new FlxGroup();
 			_eggs = new FlxGroup(7);
 			_eggs.add(new Egg(0, 2));
@@ -116,8 +128,6 @@ package states
 			loseScreen = new FlxSprite(0, 0, GraphicsData.losePNG);
 			loseScreen.alpha = 0;
 			loseScreen.exists = false;
-			
-			
 			
 			add(level);
 			
@@ -170,7 +180,6 @@ package states
 					loseScreen.alpha += 0.05;
 				}
 				player.kill();
-				_enemies.kill();
 				FlxG.music.stop();
 				if(FlxG.keys.ENTER){
 					FlxG.resetState();
@@ -205,22 +214,37 @@ package states
 				else {
 					snakeY = 4;	
 				}
+				var enemy:Enemy;
 				if (levelTimer > timeLimit / 2 && Registry.level > 1)
 				{
-					_enemies.add(new Snake(13, snakeY));
+					//enemy = recycleSnake(13, eY);
+					//_enemies.add(recycleSnake(13, eY));
+					_enemies.add(new Snake(13, snakeY));//
 				}
 				if (Registry.level == 5)
 				{
-					_enemies.add(new Merman(16, eY));
+					enemy = recycleMerman(16, eY);
+					//_enemies.add(recycleMerman(16, eY));
+					//_enemies.add(new Merman(16, eY));//
 				}
 				else
 				{
-					_enemies.add(new Crab(16, eY));
+					enemy = recycleCrab(16, eY);
+					//_enemies.add(recycleCrab(16, eY));
+					//_enemies.add(new Crab(16, eY));//
 				}
 				resetSpawn = true;
 			}
 			
-			if (levelTimer > timeLimit)//win!
+			/*if (levelTimer > timeLimit) {//win!
+				_won = true;
+			}*/
+			
+			if (_enemies.countDead() == enemyLimit) {
+					_won = true;
+			}
+			
+			if (_won)
 			{
 				if(level.levelNumber == 1){
 					Registry.level=2;
@@ -282,6 +306,48 @@ package states
 			FlxG.overlap(player, _loot, getLoot);
 		}
 		
+		private function recycleCrab(tx:int, ty:int, type:int=1):Enemy
+		{
+			var enemyC:Crab = getFirstAvailable() as Crab;
+			if (enemyC == null)
+			{
+				var newEnemy:Enemy = new Crab(tx, ty);
+				_enemies.add(newEnemy);
+				return newEnemy;
+			}
+			enemyC.reset(tx, ty);
+			return enemyC;
+		}
+		
+		private function recycleSnake(tx:int, ty:int, type:int=1):Enemy
+		{
+			var enemyS:Snake = getFirstAvailable() as Snake;
+			if (enemyS == null)
+			{
+				var newEnemy:Enemy = new Snake(tx, ty);
+				_enemies.add(newEnemy);
+				return newEnemy;
+			}
+			enemyS.reset(tx, ty);
+			return enemyS;
+		}
+		
+		private function recycleMerman(tx:int, ty:int, type:int=1):Enemy
+		{
+			var enemyM:Merman = getFirstAvailable() as Merman;
+			if (enemyM == null)
+			{
+				var newEnemy:Enemy = new Merman(tx, ty);
+				_enemies.add(newEnemy);
+				return newEnemy;
+			}
+			enemyM.reset(tx, ty);
+			return enemyM;
+		}
+
+
+				
+		
 		public function hitEgg(e:Enemy, g:Egg):void {
 			if (FlxCollision.pixelPerfectCheck(e, g))
 			{
@@ -300,7 +366,7 @@ package states
 		}
 		
 		public function hitPlayer(p:Player, e:Enemy):void {
-			if (FlxCollision.pixelPerfectCheck(p, e))
+			if (FlxCollision.pixelPerfectCheck(p, e)&&p._canBeHit)
 			{
 				p.health -= 10;
 				if (p.health < 0)
@@ -313,7 +379,7 @@ package states
 				 	pushPlayer(p, e);
 				}
 				p.flicker(0.5);
-				p.solid = false;
+				p._canBeHit = false;
 			}
 		}
 		

@@ -13,6 +13,7 @@ package
 		public static var player:Player;
 		public static var level:int = 1;
 		public static var gameEnd:Boolean = false;
+		public static var easyMode:Boolean = true;
 		
 		public function Registry() 
 		{

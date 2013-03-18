@@ -8,6 +8,7 @@ package players
 	{	
 		private var lifeCount:Number = 0;
 		private var solidCount:Number = 0;
+		public var _canBeHit:Boolean = true;
 
 		public function Player(X:Number, Y:Number)
 		{
@@ -15,9 +16,9 @@ package players
 
 			loadGraphic(GraphicsData.playerPNG, true, true, 16, 18, true);
 			
-			width = 14;
+			width = 16;
 			height = 14;
-			offset.y = 2;
+			offset.y = 4;
 			
 			health = 100;
 			
@@ -68,12 +69,12 @@ package players
 				swing();
 			}
 			
-			if (!solid)
+			if (!_canBeHit)
 			{
 				solidCount+= FlxG.elapsed;
 				if (solidCount >= 0.5)
 				{
-				solid = true;
+				_canBeHit = true;
 				solidCount = 0;
 				}	
 			}

@@ -15,6 +15,7 @@ package
 	 */
 	public class Preloader extends MovieClip 
 	{
+		private var player:Player;
 		
 		public function Preloader() 
 		{

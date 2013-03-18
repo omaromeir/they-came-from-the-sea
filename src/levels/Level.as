@@ -13,6 +13,8 @@ package levels
 		public var height:int;
 		
 		public var timeLimit:int;
+		public var enemyLimit:int;
+		
 		public var landWidth:int;
 		public var eggs:int;
 		

@@ -20,6 +20,9 @@ package enemies
 		override public function update():void
 		{
 			super.update();
+			if (x > Registry.map.width || y > Registry.map.height || y < 0) {
+				kill();
+			}
 		}
 		
 		public function turnAround(speed:int):void {

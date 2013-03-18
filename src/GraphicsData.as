@@ -20,7 +20,8 @@ package
 		[Embed(source = 'assets/eggSpriteSheet.png')] public static var eggPNG:Class;
 		[Embed(source = 'assets/youLose.png')] public static var losePNG:Class;
 		[Embed(source = 'assets/youWin.png')] public static var winPNG:Class;
-		[Embed(source = 'assets/clickEnter.png')] public static var enterPNG:Class;
+		//[Embed(source = 'assets/clickEnter.png')] public static var enterPNG:Class;
+		[Embed(source = 'assets/clickEnterSpriteSheet.png')] public static var enterPNG:Class;
 		[Embed(source = 'assets/instructions.png')] public static var instructionsPNG:Class;
 		[Embed(source = 'assets/level1Intro.png')] public static var level1IntroPNG:Class;
 		[Embed(source = 'assets/level2Intro.png')] public static var level2IntroPNG:Class;

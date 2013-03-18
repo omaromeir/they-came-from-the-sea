@@ -51,6 +51,10 @@ package states
 			text.exists = false;*/
 			
 			text = new FlxSprite(0, 105, GraphicsData.enterPNG);
+			text.loadGraphic(GraphicsData.enterPNG, true, false, 256, 48);
+			text.addAnimation("easy", [0], 0, false);
+			text.addAnimation("hard", [1], 0, false);
+			text.play("easy");
 			text.exists = false;
 			
 			instructions = new FlxSprite(0, 0, GraphicsData.instructionsPNG);
@@ -77,6 +81,9 @@ package states
 				if (FlxG.keys.justPressed("ESCAPE")) {
 					toggleInstructions();
 				}
+				if (FlxG.keys.justPressed("UP")||FlxG.keys.justPressed("DOWN")) {
+					toggleEasy();
+				}
 			}
 		}
 
@@ -88,6 +95,18 @@ package states
 		private function toggleInstructions():void
 		{
 			instructions.exists = !instructions.exists;
+		}
+		
+		private function toggleEasy():void
+		{
+			if (Registry.easyMode) {
+				Registry.easyMode = false;
+				text.play("hard");
+			}
+			else {
+				Registry.easyMode = true;
+				text.play("easy");
+			}
 		}
 	}
 }

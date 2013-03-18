@@ -3,7 +3,7 @@ package
 	import flash.display.Sprite;
 	import flash.events.Event;
 
-	[Frame(factoryClass="Preloader")]
+	[Frame(factoryClass="CustomPreloader")]
 	public class Main extends Sprite
 	{
 		public function Main():void
